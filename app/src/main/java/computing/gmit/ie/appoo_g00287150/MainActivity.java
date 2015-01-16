@@ -88,51 +88,6 @@ public class MainActivity extends Activity {
 
     }
 
-    View.OnClickListener listener = new View.OnClickListener() {
-
-        @Override
-        public void onClick(View v) {
-            switch (v.getId()) {
-                case R.id.btnPrefs:
-                    Intent intent = new Intent(PrefsActivity.this,
-                            PrefsActivity.class);
-                    startActivity(intent);
-                    break;
-
-                case R.id.btnGetPreferences:
-                    displaySharedPreferences();
-                    break;
-
-                default:
-                    break;
-            }
-        }
-    };
-
-    btnPrefs.setOnClickListener(listener);
-    btnGetPrefs.setOnClickListener(listener);
-}
-
-    private void displaySharedPreferences() {
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(PrefsActivity.this);
-
-        String username = prefs.getString("username", "Default NickName");
-        String passw = prefs.getString("password", "Default Password");
-        boolean checkBox = prefs.getBoolean("checkBox", false);
-        String listPrefs = prefs.getString("listpref", "Default list prefs");
-
-        StringBuilder builder = new StringBuilder();
-        builder.append("Username: " + username + "\n");
-        builder.append("Password: " + passw + "\n");
-        builder.append("Keep me logged in: " + String.valueOf(checkBox) + "\n");
-        builder.append("List preference: " + listPrefs);
-
-        textView.setText(builder.toString());
-    }
-
-
-
     public void refreshScreen(Node node){
         setContentView(R.layout.dynamic_layout);
         LinearLayout buttons = (LinearLayout) findViewById(R.id.dyn_layout);
