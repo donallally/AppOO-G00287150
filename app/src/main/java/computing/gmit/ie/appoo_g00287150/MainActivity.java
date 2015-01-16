@@ -2,10 +2,13 @@ package computing.gmit.ie.appoo_g00287150;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -18,7 +21,7 @@ import java.util.List;
 
 
 public class MainActivity extends Activity {
-
+    TextView textView;
     private EditText editTextShowLocation;
     private Button buttonGetLocation;
 
@@ -39,36 +42,30 @@ public class MainActivity extends Activity {
     //Called when the activity is first created.
     public void onCreate(Bundle savedInstanceState) {
 
-        //buildTree();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dynamic_layout);
-
-        editTextShowLocation = (EditText) findViewById(R.id.editTextShowLocation);
-
-//        buttonGetLocation = (Button) findViewById(R.id.buttonGetLocation);
-//        buttonGetLocation.setOnClickListener(new OnClickListener() {
-//            public void onClick(View v) {
-//                buttonGetLocationClick();
-//            }
-//        });
 
         currentNode.addChild(child1);
         currentNode.addChild(child2);
         child1.addChild(child3);
         child1.addChild(child4);
 
+        Button btnPrefs = (Button) findViewById(R.id.btnPrefs);
+        Button btnGetPrefs = (Button) findViewById(R.id.btnGetPreferences);
+
+        textView = (TextView) findViewById(R.id.txtPrefs);
+
         TextView title = (TextView) findViewById(R.id.current);
         title.setText(currentNode.getName());
 
-
-        if(currentNode.getChildren() != null){
+        if (currentNode.getChildren() != null) {
             for (int i = 0; i < currentNode.getChildren().size(); i++) {
                 Button button = new Button(this);
                 button.setText(currentNode.getChildren().get(i).getName());
                 button.setId(i);
                 final int buttonID = button.getId();
 
-                RelativeLayout layout = (RelativeLayout) findViewById(R.id.dyn_layout);
+                LinearLayout layout = (LinearLayout) findViewById(R.id.dyn_layout);
                 layout.addView(button);
 
                 button.setOnClickListener(new View.OnClickListener() {
@@ -79,11 +76,66 @@ public class MainActivity extends Activity {
             }
         }
 
+        Button btnTree = (Button) findViewById(R.id.add);
+        btnTree.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+                Intent in = new Intent(MainActivity.this, AddActivity.class);
+                startActivity(in);
+            }
+        });
+
     }
+
+    View.OnClickListener listener = new View.OnClickListener() {
+
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.btnPrefs:
+                    Intent intent = new Intent(PrefsActivity.this,
+                            PrefsActivity.class);
+                    startActivity(intent);
+                    break;
+
+                case R.id.btnGetPreferences:
+                    displaySharedPreferences();
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    };
+
+    btnPrefs.setOnClickListener(listener);
+    btnGetPrefs.setOnClickListener(listener);
+}
+
+    private void displaySharedPreferences() {
+        SharedPreferences prefs = PreferenceManager
+                .getDefaultSharedPreferences(PrefsActivity.this);
+
+        String username = prefs.getString("username", "Default NickName");
+        String passw = prefs.getString("password", "Default Password");
+        boolean checkBox = prefs.getBoolean("checkBox", false);
+        String listPrefs = prefs.getString("listpref", "Default list prefs");
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("Username: " + username + "\n");
+        builder.append("Password: " + passw + "\n");
+        builder.append("Keep me logged in: " + String.valueOf(checkBox) + "\n");
+        builder.append("List preference: " + listPrefs);
+
+        textView.setText(builder.toString());
+    }
+
+
 
     public void refreshScreen(Node node){
         setContentView(R.layout.dynamic_layout);
-        LinearLayout buttons = (LinearLayout) findViewById(R.id.dynamicBtns);
+        LinearLayout buttons = (LinearLayout) findViewById(R.id.dyn_layout);
         Button backBtn = (Button) findViewById(R.id.back);
         backBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view){
@@ -111,11 +163,6 @@ public class MainActivity extends Activity {
             }
         }
     }
-
-
-
-
-
 
     //Gets the current location and update the mobileLocation variable
     private void getCurrentLocation() {
@@ -176,7 +223,5 @@ public class MainActivity extends Activity {
         //squashed.setImage(new ImageIcon("me.png"));
         solid.addChild(squashed);
     }
-
-
 
 }
