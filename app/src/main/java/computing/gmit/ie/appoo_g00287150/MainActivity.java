@@ -14,6 +14,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.List;
+
 
 public class MainActivity extends Activity {
 
@@ -26,7 +28,8 @@ public class MainActivity extends Activity {
     private double gpsX;
     private double gpsY;
 
-    private Node root = new Node("Decision Helper Start Point");
+
+    private Node currentNode = new Node("Decision Helper Start Point");
     private Node child1 = new Node("Solid");
     private Node child2 = new Node("Flexible");
     private Node child3 = new Node("Hard");
@@ -49,36 +52,70 @@ public class MainActivity extends Activity {
 //            }
 //        });
 
-        root.addChild(child1);
-        root.addChild(child2);
+        currentNode.addChild(child1);
+        currentNode.addChild(child2);
         child1.addChild(child3);
         child1.addChild(child4);
 
         TextView title = (TextView) findViewById(R.id.current);
-        title.setText(root.getName());
+        title.setText(currentNode.getName());
 
 
-        if(child1.getChildren() != null){
-            for (int i = 0; i < child1.getChildren().size(); i++) {
+        if(currentNode.getChildren() != null){
+            for (int i = 0; i < currentNode.getChildren().size(); i++) {
                 Button button = new Button(this);
-                button.setText(child2.getName());
+                button.setText(currentNode.getChildren().get(i).getName());
                 button.setId(i);
                 final int buttonID = button.getId();
 
-                LinearLayout layout = (LinearLayout) findViewById(R.id.dyn_layout);
+                RelativeLayout layout = (RelativeLayout) findViewById(R.id.dyn_layout);
                 layout.addView(button);
 
                 button.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View view) {
-                        //refreshScreen();
+                        refreshScreen(currentNode.getChildren().get(buttonID));
                     }
                 });
             }
         }
 
-
-
     }
+
+    public void refreshScreen(Node node){
+        setContentView(R.layout.dynamic_layout);
+        LinearLayout buttons = (LinearLayout) findViewById(R.id.dynamicBtns);
+        Button backBtn = (Button) findViewById(R.id.back);
+        backBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view){
+                if(currentNode.getParent() != null){
+                    refreshScreen(currentNode.getParent());
+                }
+            }
+        });
+        currentNode = node;
+        TextView title = (TextView) findViewById(R.id.current);
+        title.setText(currentNode.getName());
+        if(currentNode.getChildren() != null){
+            List<Node> children = currentNode.getChildren();
+            for (int i = 0; i < children.size(); i++) {
+                Button button = new Button(this);
+                button.setText(children.get(i).getName().toString());
+                button.setId(i);
+                final int buttonID = button.getId();
+                buttons.addView(button);
+                button.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View view) {
+                        refreshScreen(currentNode.getChildren().get(buttonID));
+                    }
+                });
+            }
+        }
+    }
+
+
+
+
+
 
     //Gets the current location and update the mobileLocation variable
     private void getCurrentLocation() {
